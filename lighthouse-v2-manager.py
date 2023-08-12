@@ -128,8 +128,12 @@ async def run(loop, lh_macs):
                     shortcut.Targetpath = '"' + cmdPath + cmdName + '"'
                     shortcut.Arguments = "on " + " ".join(lh_macs)
                 shortcut.WorkingDirectory = cmdPath[:-1]
-                if __compiled__ : # if compiled by nuitka
-                    shutil.copyfile(os.path.join(os.path.dirname(__file__), "lhv2_on.ico"), cmdPath + "lhv2_on.ico")
+                try:
+                    if __compiled__:  # if compiled by nuitka
+                        shutil.copyfile(os.path.join(os.path.dirname(__file__), "lhv2_on.ico"), cmdPath + "lhv2_on.ico")
+                except Exception as e:
+                    print(">> Error: " + str(e))
+
                 shortcut.IconLocation = cmdPath + "lhv2_on.ico"
                 shortcut.save()
                 print("   * OK: LHv2-ON.lnk was created successfully.")
@@ -143,8 +147,14 @@ async def run(loop, lh_macs):
                     shortcut.Targetpath = '"' + cmdPath + cmdName + '"'
                     shortcut.Arguments = "off " + " ".join(lh_macs)
                 shortcut.WorkingDirectory = cmdPath[:-1]
-                if __compiled__ : # if compiled by nuitka
-                    shutil.copyfile(os.path.join(os.path.dirname(__file__), "lhv2_off.ico"), cmdPath + "lhv2_off.ico")
+                try:
+                    if __compiled__:  # if compiled by nuitka
+                        shutil.copyfile(
+                            os.path.join(os.path.dirname(__file__), "lhv2_off.ico"), cmdPath + "lhv2_off.ico"
+                        )
+                except Exception as e:
+                    print(">> Error: " + str(e))
+
                 shortcut.IconLocation = cmdPath + "lhv2_off.ico"
                 shortcut.save()
                 print("   * OK: LHv2-OFF.lnk was created successfully.")

@@ -148,6 +148,8 @@ async def run(loop, lh_macs):
                 shortcut.IconLocation = cmdPath + "lhv2_off.ico"
                 shortcut.save()
                 print("   * OK: LHv2-OFF.lnk was created successfully.")
+                if len(sys.argv) == 1:
+                    time.sleep(3)
             else:
                 print("   OK, you need to manually create two links, for example on your desktop:")
                 print(" ")

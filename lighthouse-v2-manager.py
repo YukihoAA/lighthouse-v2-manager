@@ -25,6 +25,7 @@ cmdPath = os.path.abspath(sys.argv[0]).replace(cmdName, "")
 cmdStr = (cmdPath + cmdName).replace(os.getcwd(), ".")
 if cmdStr.find(".py") > 0:
     cmdStr = '"' + sys.executable + '" "' + cmdStr + '"'
+    __compiled__ = 0
 
 if len(sys.argv) > 1 and sys.argv[1] in ["on", "off", "discover", "toggle"]:
     command = sys.argv[1]

@@ -13,6 +13,7 @@ __PWR_CHARACTERISTIC = "00001525-1212-efde-1523-785feabcd124"
 __PWR_ON = bytearray([0x01])
 __PWR_STANDBY = bytearray([0x00])
 
+retryCount = 3
 command = ""
 lh_macs = []  # hard code mac addresses here if you want, otherwise specify in command line
 
@@ -23,6 +24,7 @@ print(" ")
 cmdName = os.path.basename(sys.argv[0])
 cmdPath = os.path.abspath(sys.argv[0]).replace(cmdName, "")
 cmdStr = (cmdPath + cmdName).replace(os.getcwd(), ".")
+
 if cmdStr.find(".py") > 0:
     cmdStr = '"' + sys.executable + '" "' + cmdStr + '"'
     __compiled__ = 0
@@ -54,7 +56,9 @@ if len(sys.argv) > 1 and command == "":
 async def run(loop, lh_macs):
     if command == "discover":
         lh_macs = []
-        createShortcuts = True if (len(sys.argv) == 1 or "-cs" in sys.argv or "--create-shortcuts" in sys.argv) else False
+        createShortcuts = (
+            True if (len(sys.argv) == 1 or "-cs" in sys.argv or "--create-shortcuts" in sys.argv) else False
+        )
         print(">> MODE: discover suitable LightHouse V2")
         if createShortcuts:
             print("         and create desktop shortcuts")
@@ -67,14 +71,18 @@ async def run(loop, lh_macs):
                 continue
             print(">> Found potential Valve LightHouse at '" + d.address + "' with name '" + d.name + "'...")
             services = None
-            try:
-                async with BleakClient(d.address) as client:
-                    try:
+            retry = 0
+            for retry in range(retryCount):
+                try:
+                    async with BleakClient(d.address) as client:
                         services = client.services
-                    except Exception:
-                        print(">> ERROR: could not get services.")
-                        continue
-            except Exception:
+                        break
+                except Exception as e:
+                    print(">> ERROR: " + str(e))
+                    print("   retrying...")
+                    continue
+            if retry == retryCount:
+                print(">> ERROR: could not get services.")
                 continue
             for s in services:
                 if s.uuid == __PWR_SERVICE:
@@ -216,7 +224,7 @@ async def run(loop, lh_macs):
                     await client.connect()
                     print(">> '" + mac + "' connected...")
                     print("   Powering ON...")
-                    for i in range(3):
+                    for i in range(retryCount):
                         await client.write_gatt_char(__PWR_CHARACTERISTIC, __PWR_ON)
                         time.sleep(0.5)
                         power_state = await client.read_gatt_char(__PWR_CHARACTERISTIC)
@@ -237,7 +245,7 @@ async def run(loop, lh_macs):
                     await client.connect()
                     print(">> '" + mac + "' connected...")
                     print("   Putting in STANDBY...")
-                    for i in range(3):
+                    for i in range(retryCount):
                         await client.write_gatt_char(__PWR_CHARACTERISTIC, __PWR_STANDBY)
                         time.sleep(0.5)
                         power_state = await client.read_gatt_char(__PWR_CHARACTERISTIC)
@@ -252,6 +260,7 @@ async def run(loop, lh_macs):
                     print(">> ERROR: " + str(e))
                 print(" ")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run(loop, lh_macs))

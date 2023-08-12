@@ -30,7 +30,10 @@ if cmdStr.find(".py") > 0:
 if len(sys.argv) > 1 and sys.argv[1] in ["on", "off", "discover", "toggle"]:
     command = sys.argv[1]
 
-if len(sys.argv) == 1 or command == "":
+if len(sys.argv) == 1:
+    command = "discover"
+
+if len(sys.argv) > 1 and command == "":
     print(" Invalid or no command given. Usage:")
     print(" ")
     print(" * discover LightHouse V2:")
@@ -51,7 +54,7 @@ if len(sys.argv) == 1 or command == "":
 async def run(loop, lh_macs):
     if command == "discover":
         lh_macs = []
-        createShortcuts = True if ("-cs" in sys.argv or "--create-shortcuts" in sys.argv) else False
+        createShortcuts = True if (len(sys.argv) == 1 or "-cs" in sys.argv or "--create-shortcuts" in sys.argv) else False
         print(">> MODE: discover suitable LightHouse V2")
         if createShortcuts:
             print("         and create desktop shortcuts")

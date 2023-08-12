@@ -6,6 +6,7 @@ import re
 import os
 import time
 from bleak import BleakScanner, BleakClient
+import shutil
 
 __PWR_SERVICE = "00001523-1212-efde-1523-785feabcd124"
 __PWR_CHARACTERISTIC = "00001525-1212-efde-1523-785feabcd124"
@@ -123,6 +124,8 @@ async def run(loop, lh_macs):
                     shortcut.Targetpath = '"' + cmdPath + cmdName + '"'
                     shortcut.Arguments = "on " + " ".join(lh_macs)
                 shortcut.WorkingDirectory = cmdPath[:-1]
+                if __compiled__ : # if compiled by nuitka
+                    shutil.copyfile(os.path.join(os.path.dirname(__file__), "lhv2_on.ico"), cmdPath + "lhv2_on.ico")
                 shortcut.IconLocation = cmdPath + "lhv2_on.ico"
                 shortcut.save()
                 print("   * OK: LHv2-ON.lnk was created successfully.")
@@ -136,6 +139,8 @@ async def run(loop, lh_macs):
                     shortcut.Targetpath = '"' + cmdPath + cmdName + '"'
                     shortcut.Arguments = "off " + " ".join(lh_macs)
                 shortcut.WorkingDirectory = cmdPath[:-1]
+                if __compiled__ : # if compiled by nuitka
+                    shutil.copyfile(os.path.join(os.path.dirname(__file__), "lhv2_off.ico"), cmdPath + "lhv2_off.ico")
                 shortcut.IconLocation = cmdPath + "lhv2_off.ico"
                 shortcut.save()
                 print("   * OK: LHv2-OFF.lnk was created successfully.")
@@ -231,6 +236,6 @@ async def run(loop, lh_macs):
                     print(">> ERROR: " + str(e))
                 print(" ")
 
-
-loop = asyncio.get_event_loop()
-loop.run_until_complete(run(loop, lh_macs))
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run(loop, lh_macs))

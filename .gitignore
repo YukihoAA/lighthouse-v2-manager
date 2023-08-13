@@ -128,3 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 lighthouse-v2-manager.exe
+compile.ps1
